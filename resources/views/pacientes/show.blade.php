@@ -31,6 +31,13 @@
 @endforelse
 
 <div class="acciones">
+    <form method="POST" action="{{ route('pacientes.destroy', $paciente) }}"
+        onsubmit="return confirm('¿Eliminar a este paciente?')">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="secondary">Eliminar</button>
+    </form>
+
     <a href="{{ route('pacientes.edit', $paciente) }}" role="button">Editar</a>
     <a href="{{ route('pacientes.index') }}">Volver al listado</a>
 </div>
