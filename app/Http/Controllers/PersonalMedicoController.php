@@ -70,7 +70,18 @@ class PersonalMedicoController extends Controller
      */
     public function show(PersonalMedico $personalMedico)
     {
-        //
+        $proximas = $personalMedico->citas()
+            ->with('paciente')
+            ->where('fecha_hora', '>=', now())
+            ->whereIn('estado', ['pendiente', 'confirmada'])
+            ->orderBy('fecha_hora')
+            ->take(10)
+            ->get();
+
+        return view('personal-medico.show', [
+            'medico'   => $personalMedico->load('user'),
+            'proximas' => $proximas,
+        ]);
     }
 
     /**
@@ -78,15 +89,23 @@ class PersonalMedicoController extends Controller
      */
     public function edit(PersonalMedico $personalMedico)
     {
-        //
+        return view('personal-medico.edit', [
+            'medico'  => $personalMedico,
+            'cuentas' => $this->cuentasDisponibles($personalMedico),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePersonalMedicoRequest $request, PersonalMedico $personalMedico)
-    {
-        //
+    public function update(
+        UpdatePersonalMedicoRequest $request,
+        PersonalMedico $personalMedico
+    ) {
+        $personalMedico->update($request->validated());
+
+        return redirect()->route('personal-medico.show', $personalMedico)
+            ->with('ok', 'Datos del profesional actualizados.');
     }
 
     /**
